@@ -52,8 +52,7 @@ Broadlink.prototype.genDevice = function(devtype, host, mac) {
         dev = new device(host, mac);
         dev.sp2();
         return dev;
-    }
-    /*else if (devtype == 0x2712) { // RM2
+    }else if (devtype == 0x2712) { // RM2
            dev = new device(host, mac);
            dev.rm();
            return dev;
@@ -89,21 +88,24 @@ Broadlink.prototype.genDevice = function(devtype, host, mac) {
            dev = new device(host, mac);
            dev.rm();
            return dev;
-       } */
-    else if (devtype == 0x2714) { // A1
-        dev = new device(host, mac);
-        dev.a1();
-        return dev;
-    } else if (devtype == 0x4EB5) { // MP1
-        dev = new device(host, mac);
-        dev.mp1();
-        return dev;
-    } else if (devtype == 0x4F1B) { // MP2
-        dev = new device(host, mac);
-        dev.mp2();
-        return dev;
-    } else {
-        //console.log("unknown device found... dev_type: " + devtype.toString(16) + " @ " + host.address);
+       } else if(devtype == 0x279d){ // RM3 Pro Plus
+            dev = new device(host,mac);
+            dev.rm(true);
+            return dev;;
+        }else if (devtype == 0x2714) { // A1
+            dev = new device(host, mac);
+            dev.a1();
+            return dev;
+        } else if (devtype == 0x4EB5) { // MP1
+            dev = new device(host, mac);
+            dev.mp1();
+            return dev;
+        } else if (devtype == 0x4F1B) { // MP2
+            dev = new device(host, mac);
+            dev.mp2();
+            return dev;
+        } else {
+            logger.info("unknown device found... dev_type: " + devtype.toString(16) + " @ " + host.address);
         //dev = new device(host, mac);
         //dev.device();
         return null;
@@ -116,7 +118,7 @@ Broadlink.prototype.genDevice = function(devtype, host, mac) {
     this.reachable = [];
     var address_parts = address.split('.');
     var size = 254; //except 0&255
-    const session = ping.createSession();
+    const session = ping.createSession();d
     for(let i = 39;i<40;i++){ 
         (function(host){
 
