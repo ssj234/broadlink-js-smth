@@ -1,6 +1,6 @@
 var logger = require("./log.js").Logger;
 var util = require('util');
-var ping = require ("net-ping");
+// var ping = require ("net-ping");
 let EventEmitter = require('events');
 let dgram = require('dgram');
 let os = require('os');
@@ -110,7 +110,7 @@ Broadlink.prototype.genDevice = function(devtype, host, mac) {
     }
 }
 
-Broadlink.prototype.findReachable = function(local_ip_address){
+/*Broadlink.prototype.findReachable = function(local_ip_address){
     var address = this.getSelfIP(local_ip_address);
     var self = this;
     this.reachable = [];
@@ -133,7 +133,7 @@ Broadlink.prototype.findReachable = function(local_ip_address){
         })(address_parts[0] +"."+ address_parts[1] +"."+ address_parts[2] +"."+i);
     }
     
-}
+}*/
 
 Broadlink.prototype.getSelfIP = function(local_ip_address){
     var interfaces = os.networkInterfaces();
