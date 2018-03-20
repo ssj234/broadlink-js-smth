@@ -1,0 +1,23 @@
+{
+  "name": "broadlink-js-smth",
+  "version": "0.0.1",
+  "description": "Discover and Communication with Broadlink devices use node.js,from  [momodalo/broadlinkjs]",
+  "main": "index.js",
+  "scripts": {
+    "find": "node test/findDevice.js",
+    "test": "node test/findDevice.js"
+  },
+  "keywords": [
+    "broadlink-js",
+    "broadlink"
+  ],
+  "author": "ssj234",
+  "license": "ISC",
+  "dependencies": {
+    
+  },
+  "devDependencies": {
+    "net-ping": "^1.2.1",
+    "log4js": "~2.5.3"
+  }
+}
