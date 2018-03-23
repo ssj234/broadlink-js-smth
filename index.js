@@ -214,7 +214,7 @@ Broadlink.prototype.discover = function(local_ip_address,targets) {
         packet[0x21] = checksum >> 8;
 
         for(let index in targets){
-            var target = targets[index];
+            var target = "255.255.255.255";// targets[index];
             logger.debug("Send package to %s",target);
             cs.sendto(packet, 0, packet.length, 80, target);
         }
@@ -231,7 +231,7 @@ Broadlink.prototype.discover = function(local_ip_address,targets) {
     cs.on("message", (msg, rinfo) => {
         
         var host = rinfo;
-        logger.debug("Receive package from "+host);
+        logger.debug("Receive package from "+host.address);
 
         var mac = Buffer.alloc(6, 0);
         msg.copy(mac, 0x00, 0x3F);
@@ -251,19 +251,19 @@ Broadlink.prototype.discover = function(local_ip_address,targets) {
             if (dev) {
                 this.devices[mac] = dev;
                 dev.on("deviceReady", () => { this.emit("deviceReady", dev); });
-                dev.auth();
+                dev.auth();// 发送验证数据
             }
         }
     });
 
     cs.on('close', function() {
-        //console.log('===Server Closed');
+        console.log('===Server Closed');
     });
 
     cs.bind(0, address);
 
     setTimeout(function() {
-        cs.close();
+        // cs.close();
     }, 300);
 }
 
@@ -285,8 +285,8 @@ function device(host, mac, timeout = 10) {
     this.cs.on('listening', function() {
         //this.cs.setBroadcast(true);
     });
-    this.cs.on("message", (response, rinfo) => { //每个设备都会开启一个udp服务器
-        logger.debug(this.mac+" received message!");
+    this.cs.on("message", (response, rinfo) => { // 针对每个设备都会开启一个udp服务器，auth()后会返回
+        logger.debug(" received message from %s !",rinfo.address);
         var enc_payload = Buffer.alloc(response.length - 0x38, 0);
         response.copy(enc_payload, 0, 0x38);
 
@@ -307,7 +307,7 @@ function device(host, mac, timeout = 10) {
 
         if (err != 0) return;
 
-        if (command == 0xe9) { // 设置auth()成功后的返回
+        if (command == 0xe9) { // 设置auth()成功后的返回,执行设备的deviceReady，设备再执行broadlink的deviceReady
             this.key = Buffer.alloc(0x10, 0);
             payload.copy(this.key, 0, 0x04, 0x14);
 
