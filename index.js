@@ -262,9 +262,6 @@ Broadlink.prototype.discover = function(local_ip_address,targets) {
 
     cs.bind(0, address);
 
-    setTimeout(function() {
-        // cs.close();
-    }, 300);
 }
 
 function device(host, mac, timeout = 10) {
