@@ -3,11 +3,13 @@ var logger = require("../log.js").Logger;
 var http = require("http");
 
 var blink = new Broadlink();
-blink.discover(null,["255.255.255.255"]);
+blink.discover(null,["b4:43:0d:70:6f:a0"]);
 
 blink.on("deviceReady",function(dev){
-    logger.debug(">>>>>>>>>>>>>>>find dev ip=" + dev.host.address);
-    if(dev.set_power)dev.set_power(true);
+    logger.debug(">>>>>>>>>>>>>>>find dev ip=" + dev.host.address +" type="+dev.type);
+    // if(dev.set_power)dev.set_power(true);
+
+    blink.discover(null,["b4:43:0d:70:6f:a0"]);
 });
 
 http.createServer(function (request, response) {

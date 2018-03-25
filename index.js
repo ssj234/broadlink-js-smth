@@ -157,6 +157,17 @@ Broadlink.prototype.getSelfIP = function(local_ip_address){
 }
 
 
+function buildMac(mac){
+    let ret = "";
+    var t = mac.toString('hex');
+    t = t.split("");
+    for(let i in t){
+        ret += t[i] ;
+        ret += (i%2==1)?":":"";
+    }
+    return ret.substring(0,17).toUpperCase();
+}
+
 Broadlink.prototype.discover = function(local_ip_address,targets) {
     self = this;
     var address = this.getSelfIP(local_ip_address);
@@ -213,10 +224,20 @@ Broadlink.prototype.discover = function(local_ip_address,targets) {
         packet[0x20] = checksum & 0xff;
         packet[0x21] = checksum >> 8;
 
-        for(let index in targets){
-            var target = "255.255.255.255";// targets[index];
-            logger.debug("Send package to %s",target);
-            cs.sendto(packet, 0, packet.length, 80, target);
+        for(let index in targets){ // 多个地址
+            let target = targets[index];// ip或者mac
+            let targetIP = target;
+            if(!target)continue;
+            if(target && target.length == 17){ // mac 地址
+                var dev = self.devices[target.toUpperCase()]; // 已经有了
+                if(dev){ 
+                    targetIP = dev.host.address;
+                }else{// 没有，发送广播
+                    targetIP = "255.255.255.255";
+                }
+            }
+            logger.debug("[Discover]Send package to %s,target is %s",targetIP,target);
+            cs.sendto(packet, 0, packet.length, 80, targetIP);
         }
         // self.on("Reached",function(target){
         //     try{
@@ -231,7 +252,7 @@ Broadlink.prototype.discover = function(local_ip_address,targets) {
     cs.on("message", (msg, rinfo) => {
         
         var host = rinfo;
-        logger.debug("Receive package from "+host.address);
+        logger.debug("[Discover]Receive package from "+host.address);
 
         var mac = Buffer.alloc(6, 0);
         msg.copy(mac, 0x00, 0x3F);
@@ -246,6 +267,7 @@ Broadlink.prototype.discover = function(local_ip_address,targets) {
             this.devices = {};
         }
 
+        mac = buildMac(mac);
         if (!this.devices[mac]) {
             var dev = this.genDevice(devtype, host, mac);
             if (dev) {
@@ -283,7 +305,7 @@ function device(host, mac, timeout = 10) {
         //this.cs.setBroadcast(true);
     });
     this.cs.on("message", (response, rinfo) => { // 针对每个设备都会开启一个udp服务器，auth()后会返回
-        logger.debug(" received message from %s !",rinfo.address);
+        logger.debug("[Device]Received message from %s !",rinfo.address);
         var enc_payload = Buffer.alloc(response.length - 0x38, 0);
         response.copy(enc_payload, 0, 0x38);
 
