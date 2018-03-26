@@ -627,12 +627,14 @@ device.prototype.sp2 = function() {
 device.prototype.a1 = function() {
     this.type = "A1";
     this.check_sensors = function() {
+        this.getRaw = false;
         var packet = Buffer.alloc(16, 0);
         packet[0] = 1;
         this.sendPacket(0x6a, packet);
     }
 
     this.check_sensors_raw = function() {
+        this.getRaw = true;
         var packet = Buffer.alloc(16, 0);
         packet[0] = 1;
         this.sendPacket(0x6a, packet);
@@ -653,6 +655,13 @@ device.prototype.a1 = function() {
         let light = payload[0x8]
         let air_quality = payload[0x0a]
         let noise = payload[0xc]
+        if(this.getRaw){
+            this.data['light'] = light;
+            this.data['air_quality'] = air_quality;
+            this.data['noise'] = noise;
+            this.emit("A1Get",this.data);
+            return;
+        }
         if(light == 0){
             this.data['light'] = 'dark';
         }else if(light == 1){
