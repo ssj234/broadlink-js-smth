@@ -657,7 +657,7 @@ device.prototype.a1 = function() {
         let noise = payload[0xc]
         if(this.getRaw){
             this.data['light'] = light;
-            this.data['air_quality'] = air_quality;
+            this.data['airQuality'] = air_quality;
             this.data['noise'] = noise;
             this.emit("A1Get",this.data);
             return;
@@ -675,15 +675,15 @@ device.prototype.a1 = function() {
         }
 
         if(air_quality == 0){
-            this.data['air_quality'] = 'excellent';
+            this.data['airQuality'] = 'excellent';
         }else if(air_quality == 1){
-            this.data['air_quality'] = 'good';
+            this.data['airQuality'] = 'good';
         }else if(air_quality == 2){
-            this.data['air_quality'] = 'normal';
+            this.data['airQuality'] = 'normal';
         }else if(air_quality == 3){
-            this.data['air_quality'] = 'bad';
+            this.data['airQuality'] = 'bad';
         }else{
-            this.data['air_quality'] = 'unknown';
+            this.data['airQuality'] = 'unknown';
         }
 
         if(noise == 0){
@@ -693,7 +693,7 @@ device.prototype.a1 = function() {
         }else if(noise == 2){
             this.data['noise'] = 'noisy';
         }else{
-            this.data['air_quality'] = 'unknown';
+            this.data['noise'] = 'unknown';
         }
         this.emit("A1Get",this.data);
     });
