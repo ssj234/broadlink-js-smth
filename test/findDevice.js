@@ -4,10 +4,21 @@ var http = require("http");
 
 var blink = new Broadlink();
 blink.discover(null,["b4:43:0d:70:6f:a0"]);
+var mac ="fdfdf";
+if(typeof mac == "string"){
+   console.log("string");
+}
 
 blink.on("deviceReady",function(dev){
+    console.log("typeof mac >>> "+typeof dev.mac);
     logger.debug(">>>>>>>>>>>>>>>find dev ip=" + dev.host.address +" type="+dev.type);
     // if(dev.set_power)dev.set_power(true);
+    if(dev.type == 'A1'){
+        dev.check_sensors();
+        dev.on("A1Get",(data) =>{
+            console.log(data);
+        });
+    }
 
     blink.discover(null,["b4:43:0d:70:6f:a0"]);
 });

@@ -630,88 +630,64 @@ device.prototype.a1 = function() {
         var packet = Buffer.alloc(16, 0);
         packet[0] = 1;
         this.sendPacket(0x6a, packet);
-        /*
-           err = response[0x22] | (response[0x23] << 8);
-           if(err == 0){
-           data = {};
-           aes = AES.new(bytes(this.key), AES.MODE_CBC, bytes(self.iv));
-           payload = aes.decrypt(bytes(response[0x38:]));
-           if(type(payload[0x4]) == int){
-           data['temperature'] = (payload[0x4] * 10 + payload[0x5]) / 10.0;
-           data['humidity'] = (payload[0x6] * 10 + payload[0x7]) / 10.0;
-           light = payload[0x8];
-           air_quality = payload[0x0a];
-           noise = payload[0xc];
-           }else{
-           data['temperature'] = (ord(payload[0x4]) * 10 + ord(payload[0x5])) / 10.0;
-           data['humidity'] = (ord(payload[0x6]) * 10 + ord(payload[0x7])) / 10.0;
-           light = ord(payload[0x8]);
-           air_quality = ord(payload[0x0a]);
-           noise = ord(payload[0xc]);
-           }
-           if(light == 0){
-           data['light'] = 'dark';
-           }else if(light == 1){
-           data['light'] = 'dim';
-           }else if(light == 2){
-           data['light'] = 'normal';
-           }else if(light == 3){
-           data['light'] = 'bright';
-           }else{
-           data['light'] = 'unknown';
-           }
-           if(air_quality == 0){
-           data['air_quality'] = 'excellent';
-           }else if(air_quality == 1){
-           data['air_quality'] = 'good';
-           }else if(air_quality == 2){
-           data['air_quality'] = 'normal';
-           }else if(air_quality == 3){
-           data['air_quality'] = 'bad';
-           }else{
-           data['air_quality'] = 'unknown';
-           }
-           if(noise == 0){
-           data['noise'] = 'quiet';
-           }else if(noise == 1){
-           data['noise'] = 'normal';
-           }else if(noise == 2){
-           data['noise'] = 'noisy';
-           }else{
-           data['noise'] = 'unknown';
-           }
-           return data;
-           }
-           */
     }
 
     this.check_sensors_raw = function() {
         var packet = Buffer.alloc(16, 0);
         packet[0] = 1;
         this.sendPacket(0x6a, packet);
-        /*
-           err = response[0x22] | (response[0x23] << 8);
-           if(err == 0){
-           data = {};
-           aes = AES.new(bytes(this.key), AES.MODE_CBC, bytes(self.iv));
-           payload = aes.decrypt(bytes(response[0x38:]));
-           if(type(payload[0x4]) == int){
-           data['temperature'] = (payload[0x4] * 10 + payload[0x5]) / 10.0;
-           data['humidity'] = (payload[0x6] * 10 + payload[0x7]) / 10.0;
-           data['light'] = payload[0x8];
-           data['air_quality'] = payload[0x0a];
-           data['noise'] = payload[0xc];
-           }else{
-           data['temperature'] = (ord(payload[0x4]) * 10 + ord(payload[0x5])) / 10.0;
-           data['humidity'] = (ord(payload[0x6]) * 10 + ord(payload[0x7])) / 10.0;
-           data['light'] = ord(payload[0x8]);
-           data['air_quality'] = ord(payload[0x0a]);
-           data['noise'] = ord(payload[0xc]);
-           }
-           return data;
-           }
-           */
     }
+    
+    this.on("payload", (err, payload) => {
+        logger.debug("a1 payload..");
+       
+        var err = payload[0x22] | (payload[0x23] << 8)
+        if(err != 0){
+            this.emit("A1Error",err);
+            return;
+        }
+        var type = payload[0x4];
+        this.data = {};
+        this.data['temperature'] = (payload[0x4] * 10 + payload[0x5]) / 10.0
+        this.data['humidity'] = (payload[0x6] * 10 + payload[0x7]) / 10.0
+        let light = payload[0x8]
+        let air_quality = payload[0x0a]
+        let noise = payload[0xc]
+        if(light == 0){
+            this.data['light'] = 'dark';
+        }else if(light == 1){
+            this.data['light'] = 'dim';
+        }else if(light == 2){
+            this.data['light'] = 'normal';
+        }else if(light == 3){
+            this.data['light'] = 'bright';
+        }else{
+            this.data['light'] = 'unknown';
+        }
+
+        if(air_quality == 0){
+            this.data['air_quality'] = 'excellent';
+        }else if(air_quality == 1){
+            this.data['air_quality'] = 'good';
+        }else if(air_quality == 2){
+            this.data['air_quality'] = 'normal';
+        }else if(air_quality == 3){
+            this.data['air_quality'] = 'bad';
+        }else{
+            this.data['air_quality'] = 'unknown';
+        }
+
+        if(noise == 0){
+            this.data['noise'] = 'quiet';
+        }else if(noise == 1){
+            this.data['noise'] = 'normal';
+        }else if(noise == 2){
+            this.data['noise'] = 'noisy';
+        }else{
+            this.data['air_quality'] = 'unknown';
+        }
+        this.emit("A1Get",this.data);
+    });
 }
 
 
