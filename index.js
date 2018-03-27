@@ -6,6 +6,24 @@ let dgram = require('dgram');
 let os = require('os');
 let crypto = require('crypto');
 
+// RM Devices (without RF support)
+const rmDeviceTypes = {};
+rmDeviceTypes[parseInt(0x2737, 16)] = 'Broadlink RM Mini';
+rmDeviceTypes[parseInt(0x273d, 16)] = 'Broadlink RM Pro Phicomm';
+rmDeviceTypes[parseInt(0x2712, 16)] = 'Broadlink RM2';
+rmDeviceTypes[parseInt(0x2783, 16)] = 'Broadlink RM2 Home Plus';
+rmDeviceTypes[parseInt(0x277c, 16)] = 'Broadlink RM2 Home Plus GDT';
+rmDeviceTypes[parseInt(0x278f, 16)] = 'Broadlink RM Mini Shate';
+
+// RM Devices (with RF support)
+const rmPlusDeviceTypes = {};
+rmPlusDeviceTypes[parseInt(0x272a, 16)] = 'Broadlink RM2 Pro Plus';
+rmPlusDeviceTypes[parseInt(0x2787, 16)] = 'Broadlink RM2 Pro Plus v2';
+rmPlusDeviceTypes[parseInt(0x278b, 16)] = 'Broadlink RM2 Pro Plus BL';
+rmPlusDeviceTypes[parseInt(0x279d, 16)] = 'Broadlink RM3 Pro Plus';
+rmPlusDeviceTypes[parseInt(0x27a9, 16)] = 'Broadlink RM3 Pro Plus v2'; // (model RM 3422)
+
+
 var Broadlink = module.exports = function() {
     EventEmitter.call(this);
     this.devices = {};
@@ -15,101 +33,57 @@ util.inherits(Broadlink, EventEmitter);
 
 
 Broadlink.prototype.genDevice = function(devtype, host, mac) {
-    var dev;
+    var dev = new device(host, mac,devtype);
     if (devtype == 0) { // SP1
-        dev = new device(host, mac);
         dev.sp1();
-        return dev;
     } else if (devtype == 0x2711) { // SP2
-        dev = new device(host, mac);
         dev.sp2();
-        return dev;
     } else if (devtype == 0x2719 || devtype == 0x7919 || devtype == 0x271a || devtype == 0x791a) { // Honeywell SP2
-        dev = new device(host, mac);
         dev.sp2();
-        return dev;
     } else if (devtype == 0x2720) { // SPMini
-        dev = new device(host, mac);
         dev.sp2();
-        return dev;
     } else if (devtype == 0x753e) { // SP3
-        dev = new device(host, mac);
         dev.sp2();
-        return dev;
     } else if (devtype == 0x2728) { // SPMini2
-        dev = new device(host, mac);
         dev.sp2();
-        return dev;
     } else if (devtype == 0x2733 || devtype == 0x273e) { // OEM branded SPMini Contros
-        dev = new device(host, mac);
         dev.sp2();
-        return dev;
     } else if (devtype >= 0x7530 && devtype <= 0x7918) { // OEM branded SPMini2
-        dev = new device(host, mac);
         dev.sp2();
-        return dev;
     } else if (devtype == 0x2736) { // SPMiniPlus
-        dev = new device(host, mac);
         dev.sp2();
-        return dev;
     }else if (devtype == 0x2712) { // RM2
-           dev = new device(host, mac);
-           dev.rm();
-           return dev;
-       } else if (devtype == 0x2737) { // RM Mini
-           dev = new device(host, mac);
-           dev.rm();
-           return dev;
-       } else if (devtype == 0x273d) { // RM Pro Phicomm
-           dev = new device(host, mac);
-           dev.rm();
-           return dev;
-       } else if (devtype == 0x2783) { // RM2 Home Plus
-           dev = new device(host, mac);
-           dev.rm();
-           return dev;
-       } else if (devtype == 0x277c) { // RM2 Home Plus GDT
-           dev = new device(host, mac);
-           dev.rm();
-           return dev;
-       } else if (devtype == 0x272a) { // RM2 Pro Plus
-           dev = new device(host, mac);
-           dev.rm();
-           return dev;
-       } else if (devtype == 0x2787) { // RM2 Pro Plus2
-           dev = new device(host, mac);
-           dev.rm();
-           return dev;
-       } else if (devtype == 0x278b) { // RM2 Pro Plus BL
-           dev = new device(host, mac);
-           dev.rm();
-           return dev;
-       } else if (devtype == 0x278f) { // RM Mini Shate
-           dev = new device(host, mac);
-           dev.rm();
-           return dev;
-       } else if(devtype == 0x279d){ // RM3 Pro Plus
-            dev = new device(host,mac);
-            dev.rm(true);
-            return dev;;
-        }else if (devtype == 0x2714) { // A1
-            dev = new device(host, mac);
-            dev.a1();
-            return dev;
-        } else if (devtype == 0x4EB5) { // MP1
-            dev = new device(host, mac);
-            dev.mp1();
-            return dev;
-        } else if (devtype == 0x4F1B) { // MP2
-            dev = new device(host, mac);
-            dev.mp2();
-            return dev;
-        } else {
-            logger.info("unknown device found... dev_type: " + devtype.toString(16) + " @ " + host.address);
-        //dev = new device(host, mac);
-        //dev.device();
+        dev.rm();
+    } else if (devtype == 0x2737) { // RM Mini
+        dev.rm();
+    } else if (devtype == 0x273d) { // RM Pro Phicomm
+        dev.rm();
+    } else if (devtype == 0x2783) { // RM2 Home Plus
+        dev.rm();
+    } else if (devtype == 0x277c) { // RM2 Home Plus GDT
+        dev.rm();
+    } else if (devtype == 0x272a) { // RM2 Pro Plus
+        dev.rm();
+    } else if (devtype == 0x2787) { // RM2 Pro Plus2
+        dev.rm();
+    } else if (devtype == 0x278b) { // RM2 Pro Plus BL
+        dev.rm();
+    } else if (devtype == 0x278f) { // RM Mini Shate
+        dev.rm();
+    } else if(devtype == 0x279d){ // RM3 Pro Plus
+        dev = new device(host,mac,devtype);
+        dev.rm(true);
+    }else if (devtype == 0x2714) { // A1
+        dev.a1();
+    } else if (devtype == 0x4EB5) { // MP1
+        dev.mp1();
+    } else if (devtype == 0x4F1B) { // MP2
+        dev.mp2();
+    } else {
+        logger.info("unknown device found... dev_type: " + devtype.toString(16) + " @ " + host.address);
         return null;
     }
+    return dev;
 }
 
 /*Broadlink.prototype.findReachable = function(local_ip_address){
@@ -286,11 +260,11 @@ Broadlink.prototype.discover = function(local_ip_address,targets) {
 
 }
 
-function device(host, mac, timeout = 10) {
+function device(host, mac,devtype, timeout = 5) {
     this.host = host;
     this.mac = mac;
     this.emitter = new EventEmitter();
-
+    this.devtype = devtype;
     this.on = this.emitter.on;
     this.emit = this.emitter.emit;
     this.removeListener = this.emitter.removeListener;
@@ -713,7 +687,11 @@ device.prototype.rm = function() {
         packet = Buffer.concat([packet, data]);
         this.sendPacket(0x6a, packet);
     }
-
+    this.cancelLearn = function() {
+        packet = Buffer.alloc(16, 0);
+        packet[0] = 0x1e;
+        this.sendPacket(0x6a, packet);
+    }
     this.enterLearning = function() {
         var packet = Buffer.alloc(16, 0);
         packet[0] = 3;
@@ -724,6 +702,27 @@ device.prototype.rm = function() {
         var packet = Buffer.alloc(16, 0);
         packet[0] = 1;
         this.sendPacket(0x6a, packet);
+    }
+
+    if(rmPlusDeviceTypes[parseInt(this.devtype, 16)]) {
+        this.supportRF = true;
+        this.enterRFSweep = () => {
+          const packet = Buffer.alloc(16, 0);
+          packet[0] = 0x19;
+          this.sendPacket(0x6a, packet);
+        }
+    
+        this.checkRFData = () => {
+          const packet = Buffer.alloc(16, 0);
+          packet[0] = 0x1a;
+          this.sendPacket(0x6a, packet);
+        }
+    
+        this.checkRFData2 = () => {
+          const packet = Buffer.alloc(16, 0);
+          packet[0] = 0x1b;
+          this.sendPacket(0x6a, packet);
+        }
     }
 
     this.on("payload", (err, payload) => {
@@ -738,9 +737,17 @@ device.prototype.rm = function() {
                 payload.copy(data, 0, 4);
                 this.emit("rawData", data);
                 break;
-            case 3: 
+            case 26://get from check_data
+                var data = Buffer.alloc(1, 0);
+                payload.copy(data, 0, 0x4);
+                if (data[0] !== 0x1) break;
+                this.emit('rawRFData', data);
                 break;
-            case 4:
+            case 27://get from check_data
+                var data = Buffer.alloc(1, 0);
+                payload.copy(data, 0, 0x4);
+                if (data[0] !== 0x1) break;
+                this.emit('rawRFData2', data);
                 break;
         }
     });
