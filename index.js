@@ -146,7 +146,9 @@ Broadlink.prototype.discover = function(local_ip_address,targets) {
     self = this;
     var address = this.getSelfIP(local_ip_address);
     if(!address){
-        throw Error("Cannot find self IP-Address");
+        logger.debug("Cannot find self IP-Address");
+        return;
+        // throw Error("Cannot find self IP-Address");
     }
     var cs = dgram.createSocket({ type: 'udp4', reuseAddr: true });
     cs.on('listening', function() {

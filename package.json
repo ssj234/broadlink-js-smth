@@ -1,6 +1,6 @@
 {
   "name": "broadlink-js-smth",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Discover and Communication with Broadlink devices use node.js,from  [momodalo/broadlinkjs]",
   "main": "index.js",
   "scripts": {
