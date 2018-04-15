@@ -11,19 +11,23 @@ blink.on("deviceReady",function(dev){
     // if(dev.set_power)dev.set_power(true);
     if(dev.type == 'RM2'){
         
-        dev.on("rawData",(data) =>{
-            console.log("hex:"+data.toString('hex'));
-        });
+        // dev.on("rawData",(data) =>{
+        //     console.log("hex:"+data.toString('hex'));
+        // });
 
-        dev.enterLearning();
-        logger.debug("enterLearning()");
-        setInterval(() => {
-            dev.checkData();
-            // dev.enterLearning();
-        }, 1000)
+        // dev.enterLearning();
+        // logger.debug("enterLearning()");
+        // setInterval(() => {
+        //     dev.checkData();
+        //     // dev.enterLearning();
+        // }, 1000)
+    }
+    if(dev.host.address == '192.168.0.127'){
+        console.log(">>>>>>>>>>>>>>>>>");
+        dev.set_power(false);
     }
 
-    blink.discover(null,["b4:43:0d:70:6f:a0"]);
+    blink.discover(null,[]);
 });
 
 http.createServer(function (request, response) {
