@@ -82,8 +82,9 @@ Broadlink.prototype.genDevice = function(devtype, host, mac) {
     } else if (devtype == 0x4F1B) { // MP2
         dev.mp2();
     } else {
+        dev.rm();
         logger.info("unknown device found... dev_type: " + devtype.toString(16) + " @ " + host.address);
-        return null;
+        return dev;
     }
     return dev;
 }
@@ -708,7 +709,7 @@ device.prototype.rm = function() {
         this.sendPacket(0x6a, packet);
     }
 
-    if(rmPlusDeviceTypes[parseInt(this.devtype, 16)]) {
+    // if(rmPlusDeviceTypes[parseInt(this.devtype, 16)]) {
         this.supportRF = true;
         this.enterRFSweep = () => {
           const packet = Buffer.alloc(16, 0);
@@ -727,7 +728,7 @@ device.prototype.rm = function() {
           packet[0] = 0x1b;
           this.sendPacket(0x6a, packet);
         }
-    }
+    // }
 
     this.on("payload", (err, payload) => {
         var param = payload[0];
